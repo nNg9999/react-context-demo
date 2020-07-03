@@ -1,0 +1,75 @@
+import React, { createContext, Component } from 'react';
+
+import storage from '../utils/storage';
+
+const { Provider, Consumer } = createContext();
+
+export const labels = {
+  en: {
+    themeSelectLabel: 'Toggle theme',
+    langSelectLabel: 'Select language',
+    body: 'Hey, right now you are in demo page of React context API.'
+  },
+  fr: {
+    themeSelectLabel: 'Toggle theme',
+    langSelectLabel: 'Choisir la langue',
+    body: "Hé, maintenant vous êtes sur la page de démonstration de l'API de contexte de réaction."
+  },
+  sp: {
+    themeSelectLabel: 'Alternar tema',
+    langSelectLabel: 'Seleccione el idioma',
+    body: 'Oye, ahora mismo estás en la página de demostración de la API de contexto de React.'
+  },
+  gr: {
+    themeSelectLabel: 'Thema umschalten',
+    langSelectLabel: 'Sprache auswählen',
+    body: 'Hey, im Moment bist du auf der Demo-Seite von React Context API.'
+  },
+  hn: {
+    langSelectLabel: 'भाषा चुनिए',
+    themeSelectLabel: 'विषय टॉगल करें',
+    body: 'अरे, अभी आप प्रतिक्रिया संदर्भ API के डेमो पेज में हैं।'
+  }
+}
+
+export default class LanguageContext extends Component {
+  static Consumer = Consumer;
+
+  toggleLanguage = (newLang) => {
+    this.setState({ language: newLang });
+  }
+
+  state = {
+    language: 'en',
+    toggleLanguage: this.toggleLanguage,
+  }
+
+
+  componentDidMount() {
+    const persistedContacts = storage.get("language");
+
+    if (persistedContacts) {
+      this.setState({
+        language: persistedContacts,
+      })
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { language } = this.state;
+
+    if (prevState.language !== language) {
+      storage.save('language', language);
+    }
+  }
+
+  render() {
+    return <Provider value={{
+      name: this.state.language,
+      labels: labels[this.state.language],
+      toggleLanguage: this.toggleLanguage,
+    }}>
+      {this.props.children}
+    </Provider>;
+  }
+}
